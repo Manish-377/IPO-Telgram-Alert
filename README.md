@@ -69,9 +69,15 @@ python ipo_alert.py
 
 ## 📋 Requirements
 
+**Python Packages:**
 ```bash
-pip install requests beautifulsoup4
+pip install requests beautifulsoup4 selenium
 ```
+
+**Chrome/Chromium:**
+- For local testing: Install [Chrome](https://www.google.com/chrome/) or [Chromium](https://www.chromium.org/)
+- ChromeDriver will be installed automatically by Selenium
+- GitHub Actions: Automatically configured
 
 ## 🎯 Filtering Criteria
 
