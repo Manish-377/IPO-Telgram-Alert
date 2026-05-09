@@ -19,7 +19,6 @@ HEADERS = {
 # Filter thresholds
 MIN_GMP_PCT = 20
 MIN_SUB_X = 10
-LOOKBACK_DAYS = 7
 
 
 # ================= TELEGRAM =================
@@ -213,11 +212,10 @@ def find_subscription(sub_data, ipo_name):
 # ================= MAIN =================
 def main():
     today = datetime.now()
-    cutoff = today - timedelta(days=LOOKBACK_DAYS)
 
     print(f"=== IPO Alert Bot  |  {today.strftime('%d %b %Y')} ===")
     print(f"Criteria: GMP >= {MIN_GMP_PCT}%  |  Subscription >= {MIN_SUB_X}x")
-    print(f"Window:   Past {LOOKBACK_DAYS} days\n")
+    print(f"Filter:   Open IPOs closing today\n")
 
     gmp_data = fetch_gmp_data()
     sub_data = fetch_subscription_data()
@@ -234,9 +232,15 @@ def main():
         print(f"  Date: {ipo['date_text']}  |  Status: {ipo['status']}  |  Type: {ipo['type']}")
         print(f"  GMP: Rs {ipo['gmp']} ({ipo['gmp_pct']}%)  |  Price: Rs {ipo['price']}")
 
-        # Date filter
-        if ipo["close_date"] and ipo["close_date"] < cutoff:
-            print(f"  -> SKIP: Closed more than {LOOKBACK_DAYS} days ago")
+        # Only Open IPOs
+        if ipo["status"].lower() != "open":
+            print(f"  -> SKIP: Status is '{ipo['status']}', not Open")
+            continue
+
+        # Must be closing today
+        if not ipo["close_date"] or ipo["close_date"].date() != today.date():
+            closing = ipo['close_date'].strftime('%d %b') if ipo['close_date'] else 'unknown'
+            print(f"  -> SKIP: Closes on {closing}, not today")
             continue
 
         # GMP filter
@@ -261,9 +265,9 @@ def main():
         found_any = True
 
         msg = (
-            "🚀 <b>IPO ALERT</b>\n\n"
+            "🚀 <b>IPO ALERT — Closing Today!</b>\n\n"
             f"📌 <b>{name}</b>\n"
-            f"📅 {ipo['date_text']}  |  {ipo['status']}\n"
+            f"📅 {ipo['date_text']}  |  Last day to apply!\n"
             f"🏷️ {ipo['type']}  |  Price: ₹{ipo['price']}\n\n"
             f"📈 GMP: ₹{ipo['gmp']} ({ipo['gmp_pct']}%)\n"
             f"🏦 QIB: {sub['qib']}x\n"
@@ -278,7 +282,7 @@ def main():
             print("  -> Telegram alert sent!")
 
     if not found_any:
-        print(f"\n[i] No IPOs matched all criteria in the past {LOOKBACK_DAYS} days.")
+        print(f"\n[i] No Open IPOs closing today matched all criteria.")
 
 
 if __name__ == "__main__":
@@ -290,7 +294,7 @@ if __name__ == "__main__":
             "Criteria:\n"
             f"• GMP ≥ {MIN_GMP_PCT}%\n"
             f"• Subscription ≥ {MIN_SUB_X}x\n"
-            f"• Within past {LOOKBACK_DAYS} days\n\n"
+            f"• Only Open IPOs closing today\n\n"
             "🤖 Bot Status: Active"
         )
         if send_telegram(test_msg):
