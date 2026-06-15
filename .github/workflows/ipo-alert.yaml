@@ -2,8 +2,7 @@ name: IPO Alert
 
 on:
   schedule:
-    # 3:00 AM IST is 9:30 PM UTC. 
-    # Since 9:30 PM is the previous day, we change Monday-Friday (1-5) to Sunday-Thursday (0-4)
+    # Runs at 5:00 AM IST, Monday through Friday
     - cron: '0 5 * * 1-5'
       timezone: 'Asia/Kolkata'
   workflow_dispatch:
