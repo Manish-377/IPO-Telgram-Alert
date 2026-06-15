@@ -211,7 +211,8 @@ def find_subscription(sub_data, ipo_name):
 
 # ================= MAIN =================
 def main():
-    today = datetime.now()
+    utc_now = datetime.utcnow() 
+    today = utc_now + timedelta(hours=5, minutes=30)
 
     print(f"=== IPO Alert Bot  |  {today.strftime('%d %b %Y')} ===")
     print(f"Criteria: GMP >= {MIN_GMP_PCT}%  |  Subscription >= {MIN_SUB_X}x")
