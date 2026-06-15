@@ -2,7 +2,9 @@ name: IPO Alert
 
 on:
   schedule:
-    - cron: '30 4 * * 1-5'   # 10:00 AM IST (4:30 AM UTC), Mon-Fri
+    # 3:00 AM IST is 9:30 PM UTC. 
+    # Since 9:30 PM is the previous day, we change Monday-Friday (1-5) to Sunday-Thursday (0-4)
+    - cron: '30 21 * * 0-4' 
   workflow_dispatch:
 
 jobs:
